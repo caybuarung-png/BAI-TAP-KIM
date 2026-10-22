@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vượt chướng ngại vật – Đạo đức lớp 5</title>
+<style>
+:root{--bg:#FFF4DE;--card:#fff;--ink:#2A2140;--muted:#6A5E85;--pri:#7C4DFF;--ok:#1FA85A;--okbg:#E3F8EC;--bad:#E04F4F;--badbg:#FDEAEA;--line:#E2D6F7;--sky1:#8ED3FF;--sky2:#E9F7FF;--ground:#5CBF6A}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#17122B;--card:#241C42;--ink:#F1EBFF;--muted:#B9AEDB;--pri:#9D7BFF;--ok:#4BD28A;--okbg:#14382A;--bad:#FF7B7B;--badbg:#431D22;--line:#3B2F66;--sky1:#2B3F8F;--sky2:#4B5FB8;--ground:#2F8A4B}}
+:root[data-theme="dark"]{--bg:#17122B;--card:#241C42;--ink:#F1EBFF;--muted:#B9AEDB;--pri:#9D7BFF;--ok:#4BD28A;--okbg:#14382A;--bad:#FF7B7B;--badbg:#431D22;--line:#3B2F66;--sky1:#2B3F8F;--sky2:#4B5FB8;--ground:#2F8A4B}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.4}
+.wrap{max-width:560px;margin:0 auto;padding:12px}
+h1{font-size:19px;text-align:center;margin:4px 0}
+.hud{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:17px;margin:6px 2px}
+.pw{border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:4px 10px;font:inherit;font-weight:700;cursor:pointer}
+.pw:disabled{opacity:.4}
+.scene{position:relative;height:130px;border-radius:18px;overflow:hidden;background:linear-gradient(var(--sky1),var(--sky2))}
+.scene::after{content:"";position:absolute;left:0;right:0;bottom:0;height:28px;background:var(--ground)}
+.cloud{position:absolute;top:10px;font-size:28px;opacity:.9}
+.hero,.obs{position:absolute;bottom:22px;font-size:42px;transition:left .7s ease;z-index:2}
+.obs{font-size:46px;transition:opacity .4s,transform .4s}
+.obs.gone{opacity:0;transform:scale(2) rotate(30deg)}
+.flag{position:absolute;right:8px;bottom:22px;font-size:40px;z-index:1}
+.jump{animation:jump .7s}
+@keyframes jump{0%,100%{transform:translateY(0)}50%{transform:translateY(-60px)}}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.timer{height:10px;background:var(--line);border-radius:6px;margin:10px 0;overflow:hidden}
+.timer i{display:block;height:100%;width:100%;background:var(--pri);transition:width 1s linear}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-top:10px}
+.q{font-size:17px;font-weight:600;margin:0 0 8px}
+.opt{display:block;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:8px;cursor:pointer}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}
+.opt.bad{border-color:var(--bad);background:var(--badbg);opacity:.8}
+.opt.off{display:none}
+.fb{margin-top:10px;padding:12px;border-radius:12px;font-size:15px}
+.fb.ok{background:var(--okbg)}.fb.bad{background:var(--badbg)}
+.btn{display:block;width:100%;margin-top:12px;padding:13px;border:0;border-radius:14px;background:var(--pri);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.center{text-align:center}.big{font-size:56px;margin:4px 0}
+.av{display:flex;gap:10px;justify-content:center;margin:10px 0}
+.av button{font-size:34px;background:var(--card);border:3px solid var(--line);border-radius:16px;padding:6px 10px;cursor:pointer}
+.av button.sel{border-color:var(--pri)}
+.hide{display:none}
+.sub{color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🏃 Vượt chướng ngại vật</h1>
+  <div class="center sub">Đạo đức lớp 5 – Bài: Vượt qua khó khăn</div>
+
+  <div class="card center" id="start">
+    <p class="q">Chọn nhân vật của bạn</p>
+    <div class="av" id="av"></div>
+    <p class="sub">Chạy tới lá cờ, vượt qua 10 chướng ngại vật bằng cách chọn đúng cách ứng xử. Bạn có ❤️ 3 mạng, mỗi câu có 20 giây, và 2 lượt dùng 💡 để bỏ bớt 1 đáp án sai.</p>
+    <button class="btn" onclick="startGame()">Bắt đầu chạy!</button>
+  </div>
+
+  <div class="hide" id="game">
+    <div class="hud"><span id="hl"></span><span id="cn"></span><button class="pw" id="pw" onclick="hint()"></button></div>
+    <div class="scene" id="scene">
+      <span class="cloud" style="left:12%">☁️</span><span class="cloud" style="left:55%;top:24px">☁️</span>
+      <span class="flag">🚩</span>
+      <span class="hero" id="hero"></span><span class="obs" id="obs"></span>
+    </div>
+    <div class="timer"><i id="tm"></i></div>
+    <div class="card">
+      <div class="sub" id="qn"></div>
+      <p class="q" id="qt"></p>
+      <div id="opts"></div><div id="fb"></div>
+      <button class="btn hide" id="next" onclick="next()">Chạy tiếp ➜</button>
+    </div>
+  </div>
+
+  <div class="card center hide" id="end">
+    <div class="big" id="eico"></div>
+    <p class="q" id="et"></p>
+    <p class="sub" id="es"></p>
+    <button class="btn" onclick="startGame()">Chơi lại</button>
+  </div>
+</div>
+<script>
+var Q=[
+{o:"🪨",q:"Bạn gặp một bài toán khó, làm mãi chưa ra. Bạn nên làm gì?",a:["Chép bài của bạn cho nhanh","Bình tĩnh đọc kĩ đề, thử cách khác, nhờ thầy cô hoặc bạn gợi ý khi cần","Bỏ không làm vì khó quá"],c:1,e:"Gặp khó khăn, ta cần bình tĩnh, cố gắng tìm cách giải quyết và biết nhờ người khác giúp đỡ."},
+{o:"🤒",q:"Bạn Lan ốm phải nghỉ học một tuần nên bị hổng bài. Lan nên làm gì?",a:["Tự giác học bù và nhờ bạn, cô giáo hướng dẫn","Nghỉ luôn vì chắc không theo kịp","Chờ cô giáo nhắc rồi mới học"],c:0,e:"Chủ động học bù và nhờ sự giúp đỡ là cách vượt qua khó khăn do ốm đau."},
+{o:"🧱",q:"Gia đình Minh còn nhiều khó khăn. Minh nên làm gì?",a:["Tự ti, ngại chơi với các bạn","Cố gắng học tốt, giúp bố mẹ những việc vừa sức","Trách bố mẹ không giàu có"],c:1,e:"Hoàn cảnh khó khăn không đáng xấu hổ. Cố gắng học tập và phụ giúp gia đình là điều đáng quý."},
+{o:"🏆",q:"Đội của bạn thi đấu thua trong cuộc thi cấp trường. Bạn nên làm gì?",a:["Giận dỗi và không tham gia nữa","Đổ lỗi cho bạn trong đội","Rút kinh nghiệm, cùng nhau luyện tập để lần sau tốt hơn"],c:2,e:"Thất bại là cơ hội để rút kinh nghiệm và cố gắng hơn, không nên nản chí hay đổ lỗi."},
+{o:"🦽",q:"Bạn Nam bị khuyết tật ở chân, đi lại khó khăn. Bạn nên làm gì?",a:["Động viên, giúp đỡ khi bạn cần và tôn trọng bạn","Trêu bạn cho vui","Tránh xa bạn vì sợ phiền"],c:0,e:"Cần quan tâm, động viên và giúp đỡ những bạn gặp khó khăn, không được chê cười."},
+{o:"🌊",q:"Bão lũ làm hỏng nhà một bạn cùng lớp. Lớp bạn nên làm gì?",a:["Mặc kệ vì không liên quan đến mình","Quyên góp sách vở, quần áo và động viên bạn","Chỉ hỏi thăm cho có lệ"],c:1,e:"Biết chia sẻ, giúp đỡ bạn lúc hoạn nạn thể hiện tình đoàn kết, yêu thương."},
+{o:"📉",q:"Bạn bị điểm kém ở bài kiểm tra Tiếng Việt. Bạn nên làm gì?",a:["Giấu bài kiểm tra đi","Tìm nguyên nhân, lập kế hoạch ôn tập và hỏi cô giáo chỗ chưa hiểu","Nói rằng mình học dốt từ bé"],c:1,e:"Biết nhìn lại bản thân, lập kế hoạch và cố gắng là cách vượt qua khó khăn trong học tập."},
+{o:"🏊",q:"Bạn muốn học bơi nhưng còn sợ nước. Bạn nên làm gì?",a:["Nhảy xuống chỗ sâu để hết sợ ngay","Không bao giờ học bơi nữa","Luyện từng bước nhỏ, có người lớn hướng dẫn và đảm bảo an toàn"],c:2,e:"Vượt qua nỗi sợ cần kiên trì, làm từng bước và luôn đảm bảo an toàn."},
+{o:"🌧️",q:"Trời mưa to, đường đến trường ngập nước. Bạn nên làm gì?",a:["Lội qua thật nhanh dù nước chảy xiết","Mặc áo mưa, đi cẩn thận cùng người lớn hoặc nhờ người lớn đưa đón","Ở nhà luôn, không báo cho ai"],c:1,e:"Vượt khó phải an toàn: nhờ người lớn giúp đỡ và báo với thầy cô khi không thể đến lớp."},
+{o:"✍️",q:"Bạn tập viết chữ đẹp mãi mà chữ vẫn chưa đẹp. Bạn nên làm gì?",a:["Nghĩ mình không có năng khiếu và bỏ luôn","Kiên trì luyện viết mỗi ngày và nhờ cô góp ý","Viết ẩu cho xong"],c:1,e:"Kiên trì luyện tập mỗi ngày giúp ta tiến bộ dần, nản chí thì sẽ không thành công."}
+];
+var AV=["🧒","👧","🐱","🐼"],av="🧒",i=0,lives=3,coins=0,combo=0,hints=2,tries=0,done=true,tl=20,tid=null,order=[];
+function $(id){return document.getElementById(id)}
+function show(id,on){$(id).classList.toggle("hide",!on)}
+function shuffle(a){for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1));var t=a[k];a[k]=a[j];a[j]=t}return a}
+function beep(f,d){try{var C=window.AudioContext||window.webkitAudioContext,c=new C(),o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(c.destination);o.start();setTimeout(function(){o.stop();c.close()},d)}catch(e){}}
+(function(){var b=$("av");AV.forEach(function(x){var e=document.createElement("button");e.textContent=x;if(x===av)e.className="sel";e.onclick=function(){av=x;[].forEach.call(b.children,function(c){c.className=""});e.className="sel"};b.appendChild(e)})})();
+function hud(){$("hl").textContent=("❤️".repeat(lives)||"💔");$("cn").textContent="🪙 "+coins+(combo>1?"  🔥x"+combo:"");$("pw").textContent="💡 "+hints;$("pw").disabled=hints<1||done}
+function place(){var n=Q.length,p=i/n;$("hero").style.left=(4+p*66)+"%";$("obs").style.left=(4+p*66+16)+"%"}
+function startGame(){i=0;lives=3;coins=0;combo=0;hints=2;order=shuffle(Q.map(function(_,k){return k}));show("start",false);show("end",false);show("game",true);$("hero").textContent=av;$("hero").style.transition="none";$("obs").style.transition="none";place();setTimeout(function(){$("hero").style.transition="";$("obs").style.transition=""},50);load()}
+function cur(){return Q[order[i]]}
+function load(){
+  var d=cur();tries=0;done=false;
+  $("obs").textContent=d.o;$("obs").className="obs";place();
+  $("qn").textContent="Chướng ngại vật "+(i+1)+"/"+Q.length;$("qt").textContent=d.q;$("fb").innerHTML="";show("next",false);
+  var box=$("opts");box.innerHTML="";
+  shuffle(d.a.map(function(_,k){return k})).forEach(function(k){
+    var b=document.createElement("button");b.className="opt";b.textContent=d.a[k];b.dataset.k=k;b.onclick=function(){pick(b,k)};box.appendChild(b)});
+  tl=20;clearInterval(tid);tick();tid=setInterval(tick,1000);hud()
+}
+function tick(){$("tm").style.width=(tl/20*100)+"%";if(tl<=0){clearInterval(tid);fail(null,true);return}tl--}
+function hint(){if(done||hints<1)return;var d=cur(),bs=[].slice.call($("opts").children).filter(function(b){return +b.dataset.k!==d.c&&!b.classList.contains("off")&&!b.classList.contains("bad")});if(bs.length>1){bs[0].classList.add("off");hints--;hud()}}
+function pick(b,k){
+  if(done)return;var d=cur();
+  if(k===d.c){
+    done=true;clearInterval(tid);b.classList.add("ok");combo++;coins+=10+(combo>1?5*(combo-1):0)+(tl>10?5:0);beep(660,150);
+    $("fb").innerHTML='<div class="fb ok">✅ <b>Chính xác!</b> '+d.e+'</div>';
+    $("obs").classList.add("gone");$("hero").classList.add("jump");setTimeout(function(){$("hero").classList.remove("jump")},750);
+    i++;$("hero").style.left=(4+i/Q.length*66)+"%";
+    $("next").textContent=i>=Q.length?"Về đích 🚩":"Chạy tiếp ➜";show("next",true);hud()
+  }else fail(b,false)
+}
+function fail(b,timeout){
+  combo=0;lives--;beep(180,250);hud();
+  $("scene").classList.add("shake");setTimeout(function(){$("scene").classList.remove("shake")},450);
+  if(b)b.classList.add("bad");
+  if(lives<=0){done=true;clearInterval(tid);var d=cur();$("fb").innerHTML='<div class="fb bad">💔 Hết mạng rồi. Đáp án đúng: <b>'+d.a[d.c]+'</b>. '+d.e+'</div>';$("next").textContent="Xem kết quả";show("next",true);$("pw").disabled=true;return}
+  if(timeout){done=true;var d2=cur();$("fb").innerHTML='<div class="fb bad">⏰ Hết giờ! Đáp án đúng: <b>'+d2.a[d2.c]+'</b>. '+d2.e+'</div>';$("next").textContent="Chạy tiếp ➜";show("next",true);i++;$("obs").classList.add("gone");$("hero").style.left=(4+i/Q.length*66)+"%";$("pw").disabled=true;if(i>=Q.length)$("next").textContent="Về đích 🚩"}
+  else $("fb").innerHTML='<div class="fb bad">❌ Chưa đúng, mất 1 mạng. Hãy suy nghĩ lại nhé!</div>'
+}
+function next(){if(lives<=0)return finish(false);if(i>=Q.length)return finish(true);load()}
+function finish(win){
+  clearInterval(tid);show("game",false);show("end",true);
+  $("eico").textContent=win?(lives===3?"🏆":"🎉"):"💪";
+  $("et").textContent=win?"Bạn đã về đích! Vượt qua mọi khó khăn!":"Chưa tới đích, nhưng bạn đã cố gắng rất nhiều!";
+  $("es").textContent="Điểm: 🪙 "+coins+" | Còn lại "+lives+" ❤️. Hãy nhớ: bình tĩnh, kiên trì và biết nhờ sự giúp đỡ thì khó khăn nào cũng vượt qua được.";
+}
+</script>
+</body>
+</html>
